@@ -18,7 +18,24 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            cd ${{ secrets.APP_DIR }}
-            git pull origin main
-            docker compose down
+            set -e
+            APP_DIR="${{ secrets.APP_DIR }}"
+            REPO_URL="${{ secrets.REPO_URL }}"
+
+            mkdir -p "$APP_DIR"
+
+            if [ ! -d "$APP_DIR/.git" ]; then
+              if [ -n "$(ls -A "$APP_DIR")" ]; then
+                echo "APP_DIR is not empty and is not a git repo: $APP_DIR"
+                exit 1
+              fi
+              git clone "$REPO_URL" "$APP_DIR"
+            fi
+
+            cd "$APP_DIR"
+            git fetch origin
+            git checkout main
+            git reset --hard origin/main
+
+            docker compose down || true
             docker compose up -d --build
