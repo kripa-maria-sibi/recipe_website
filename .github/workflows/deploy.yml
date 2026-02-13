@@ -28,9 +28,9 @@ jobs:
           port: ${{ secrets.SSH_PORT || '22' }}
           script: |
             set -e
-            DEPLOY_DIR="/opt/intern_recipe_website"
-            sudo mkdir -p "$DEPLOY_DIR"
-            sudo chown -R "${{ secrets.SSH_USER }}":"${{ secrets.SSH_USER }}" "$DEPLOY_DIR"
+            DEPLOY_DIR="/home/${{ secrets.SSH_USER }}/intern_recipe_website"
+            mkdir -p "$DEPLOY_DIR"
+            echo "Deploy dir: $DEPLOY_DIR"
 
       - name: Copy project files to server
         uses: appleboy/scp-action@v0.1.7
@@ -40,7 +40,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT || '22' }}
           source: "Dockerfile,compose.yaml,package.json,package-lock.json,server.js,public,views"
-          target: "/opt/intern_recipe_website"
+          target: "/home/${{ secrets.SSH_USER }}/intern_recipe_website"
           overwrite: true
           rm: false
           strip_components: 0
@@ -54,6 +54,10 @@ jobs:
           port: ${{ secrets.SSH_PORT || '22' }}
           script: |
             set -e
-            cd "/opt/intern_recipe_website"
+            DEPLOY_DIR="/home/${{ secrets.SSH_USER }}/intern_recipe_website"
+            cd "$DEPLOY_DIR"
+            pwd
+            ls -la
+            docker compose version
             docker compose down || true
             docker compose up -d --build
