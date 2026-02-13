@@ -5,9 +5,6 @@ on:
     branches:
       - main
 
-env:
-  DEPLOY_DIR: /opt/intern_recipe_website
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -32,8 +29,9 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             set -e
-            sudo mkdir -p "${{ env.DEPLOY_DIR }}"
-            sudo chown -R "${{ secrets.SSH_USER }}":"${{ secrets.SSH_USER }}" "${{ env.DEPLOY_DIR }}"
+            DEPLOY_DIR="/opt/intern_recipe_website"
+            sudo mkdir -p "$DEPLOY_DIR"
+            sudo chown -R "${{ secrets.SSH_USER }}":"${{ secrets.SSH_USER }}" "$DEPLOY_DIR"
 
       - name: Copy project files to server
         uses: appleboy/scp-action@v0.1.7
@@ -42,12 +40,11 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          source: "."
-          target: ${{ env.DEPLOY_DIR }}
+          source: "Dockerfile,compose.yaml,package.json,package-lock.json,server.js,public,views"
+          target: "/opt/intern_recipe_website"
           overwrite: true
           rm: false
           strip_components: 0
-          exclude: ".git,node_modules,.github"
 
       - name: Run Docker Compose on server
         uses: appleboy/ssh-action@v1.2.0
@@ -58,6 +55,6 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             set -e
-            cd "${{ env.DEPLOY_DIR }}"
+            cd "/opt/intern_recipe_website"
             docker compose down || true
             docker compose up -d --build
