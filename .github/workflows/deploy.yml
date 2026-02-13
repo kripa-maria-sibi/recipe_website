@@ -10,7 +10,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy via SSH
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Copy project files to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          source: "."
+          target: ${{ secrets.APP_DIR }}
+          overwrite: true
+          rm: false
+          strip_components: 0
+          exclude: ".git,node_modules,.github"
+
+      - name: Run Docker Compose on server
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -19,23 +36,6 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             set -e
-            APP_DIR="${{ secrets.APP_DIR }}"
-            REPO_URL="${{ secrets.REPO_URL }}"
-
-            mkdir -p "$APP_DIR"
-
-            if [ ! -d "$APP_DIR/.git" ]; then
-              if [ -n "$(ls -A "$APP_DIR")" ]; then
-                echo "APP_DIR is not empty and is not a git repo: $APP_DIR"
-                exit 1
-              fi
-              git clone "$REPO_URL" "$APP_DIR"
-            fi
-
-            cd "$APP_DIR"
-            git fetch origin
-            git checkout main
-            git reset --hard origin/main
-
+            cd "${{ secrets.APP_DIR }}"
             docker compose down || true
             docker compose up -d --build
