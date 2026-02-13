@@ -1,0 +1,41 @@
+<%- include("partials/header") %>
+
+<section class="form-shell reveal">
+  <h1>Create Recipe</h1>
+  <form class="recipe-form" method="POST" action="/recipes">
+    <label>Title
+      <input type="text" name="title" required />
+    </label>
+
+    <label>Category
+      <select name="category" required>
+        <% categories.forEach((cat) => { %>
+          <option value="<%= cat %>"><%= cat.charAt(0).toUpperCase() + cat.slice(1) %></option>
+        <% }) %>
+      </select>
+    </label>
+
+    <label>Prep Time (minutes)
+      <input type="number" name="prepTime" min="1" required />
+    </label>
+
+    <label>Ingredients (comma separated)
+      <textarea name="ingredients" rows="4" required></textarea>
+    </label>
+
+    <label>Instructions
+      <textarea name="instructions" rows="6" required></textarea>
+    </label>
+
+    <label>Photo URL
+      <input type="text" name="imageUrl" placeholder="/images/your-recipe-photo.jpg or https://example.com/photo.jpg" />
+    </label>
+
+    <div class="form-actions">
+      <button type="submit">Save Recipe</button>
+      <a href="/" class="btn-secondary">Cancel</a>
+    </div>
+  </form>
+</section>
+
+<%- include("partials/footer") %>

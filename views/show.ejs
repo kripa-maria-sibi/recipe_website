@@ -1,0 +1,37 @@
+<%- include("partials/header") %>
+
+<article class="detail-card reveal">
+  <div class="detail-layout">
+    <div class="detail-content">
+      <header>
+        <span class="badge"><%= recipe.category %></span>
+        <h1><%= recipe.title %></h1>
+        <p>Prep time: <strong><%= recipe.prepTime %> minutes</strong></p>
+      </header>
+
+      <section>
+        <h2>Ingredients</h2>
+        <p><%= recipe.ingredients %></p>
+      </section>
+
+      <section>
+        <h2>Instructions</h2>
+        <p><%= recipe.instructions %></p>
+      </section>
+
+      <div class="detail-actions">
+        <a href="/recipes/<%= recipe.id %>/edit" class="btn-primary">Edit</a>
+        <form method="POST" action="/recipes/<%= recipe.id %>?_method=DELETE" onsubmit="return confirm('Delete this recipe?');">
+          <button type="submit" class="btn-danger">Delete</button>
+        </form>
+        <a href="/" class="btn-secondary">Back</a>
+      </div>
+    </div>
+
+    <figure class="detail-media">
+      <img src="<%= recipe.imageUrl %>" alt="<%= recipe.title %>" loading="lazy" />
+    </figure>
+  </div>
+</article> 
+
+<%- include("partials/footer") %>

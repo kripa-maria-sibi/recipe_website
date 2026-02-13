@@ -1,0 +1,87 @@
+<%- include("partials/header") %>
+
+<section class="hero reveal">
+  <div class="hero-copy">
+    <span class="eyebrow">Recipe Collection</span>
+    <h1>Cook with clarity, share with confidence.</h1>
+    <p>Organize your best dishes in one clean workspace, then discover your next go-to meal in seconds.</p>
+    <div class="hero-actions">
+      <a href="/recipes/new" class="btn-primary">Create Recipe</a>
+      <a href="#recipe-list" class="btn-secondary">Browse Recipes</a>
+    </div>
+  </div>
+
+  <aside class="hero-panel">
+    <p class="panel-label">Kitchen Snapshot</p>
+    <div class="panel-metrics">
+      <div>
+        <strong><%= recipes.length %></strong>
+        <span>Total Recipes</span>
+      </div>
+      <div>
+        <strong><%= categories.length %></strong>
+        <span>Categories</span>
+      </div>
+    </div>
+    <% const featuredRecipe = recipes[0]; %>
+    <% if (featuredRecipe) { %>
+      <div class="panel-feature">
+        <span class="badge"><%= featuredRecipe.category %></span>
+        <h2><%= featuredRecipe.title %></h2>
+        <p>Ready in <%= featuredRecipe.prepTime %> mins</p>
+        <a href="/recipes/<%= featuredRecipe.id %>">Open featured recipe</a>
+      </div>
+    <% } else { %>
+      <div class="panel-feature">
+        <h2>No recipes yet</h2>
+        <p>Start by adding your first recipe to build your collection.</p>
+      </div>
+    <% } %>
+  </aside>
+</section>
+
+<section class="toolbar reveal">
+  <div class="section-head">
+    <h2>Find Your Next Dish</h2>
+    <p>Filter by keyword or category to narrow the list quickly.</p>
+  </div>
+  <form class="search-form" method="GET" action="/">
+    <input type="text" name="q" placeholder="Search by title, ingredients, or instructions..." value="<%= query %>" />
+    <select name="category">
+      <option value="all" <%= selectedCategory === "all" ? "selected" : "" %>>All Categories</option>
+      <% categories.forEach((cat) => { %>
+        <option value="<%= cat %>" <%= selectedCategory === cat ? "selected" : "" %>>
+          <%= cat.charAt(0).toUpperCase() + cat.slice(1) %>
+        </option>
+      <% }) %>
+    </select>
+    <button type="submit">Search</button>
+  </form>
+</section>
+
+<section id="recipe-list" class="card-grid">
+  <% if (recipes.length === 0) { %>
+    <article class="empty-state reveal">
+      <h2>No recipes found</h2>
+      <p>Try another keyword/category or create a new recipe.</p>
+      <a href="/recipes/new" class="btn-primary">Create Recipe</a>
+    </article>
+  <% } %>
+
+  <% recipes.forEach((recipe) => { %>
+    <article class="recipe-card reveal">
+      <div class="card-meta">
+        <span class="badge"><%= recipe.category %></span>
+        <small><%= recipe.prepTime %> mins</small>
+      </div>
+      <h3><%= recipe.title %></h3>
+      <% const preview = recipe.instructions.length > 130 ? `${recipe.instructions.slice(0, 130)}...` : recipe.instructions; %>
+      <p><%= preview %></p>
+      <div class="card-footer">
+        <a href="/recipes/<%= recipe.id %>">View Recipe</a>
+      </div>
+    </article>
+  <% }) %>
+</section>
+
+<%- include("partials/footer") %>
