@@ -15,7 +15,6 @@ jobs:
           [ -n "${{ secrets.SSH_HOST }}" ] || (echo "Missing secret: SSH_HOST" && exit 1)
           [ -n "${{ secrets.SSH_USER }}" ] || (echo "Missing secret: SSH_USER" && exit 1)
           [ -n "${{ secrets.SSH_PRIVATE_KEY }}" ] || (echo "Missing secret: SSH_PRIVATE_KEY" && exit 1)
-          [ -n "${{ secrets.SSH_PORT }}" ] || (echo "Missing secret: SSH_PORT" && exit 1)
 
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -26,7 +25,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.SSH_PORT }}
+          port: ${{ secrets.SSH_PORT || '22' }}
           script: |
             set -e
             DEPLOY_DIR="/opt/intern_recipe_website"
@@ -39,7 +38,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.SSH_PORT }}
+          port: ${{ secrets.SSH_PORT || '22' }}
           source: "Dockerfile,compose.yaml,package.json,package-lock.json,server.js,public,views"
           target: "/opt/intern_recipe_website"
           overwrite: true
@@ -52,7 +51,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.SSH_PORT }}
+          port: ${{ secrets.SSH_PORT || '22' }}
           script: |
             set -e
             cd "/opt/intern_recipe_website"
